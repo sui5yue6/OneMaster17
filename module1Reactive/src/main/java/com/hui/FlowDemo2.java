@@ -8,11 +8,43 @@ import java.util.concurrent.SubmissionPublisher;
  * @Description
  * @Date 2024/1/15 23:57
  */
-public class FlowDemo {
+public class FlowDemo2 { // 这里的问题先放一下吧
+
+    static class MyProcessor extends SubmissionPublisher<String> implements Flow.Processor<String, String> {
+        private Flow.Subscription subscription;
+        @Override
+        public void onSubscribe(Flow.Subscription subscription) {
+            System.out.println("processor 订阅绑定完成");
+            this.subscription = subscription;
+            this.subscription.request(1);
+        }
+
+        @Override // 数据到达,触发这个回调
+        public void onNext(String item) {
+
+            System.out.println("processor 订阅拿到数据");
+            item +="haha";
+            subscription.request(1);
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            System.out.println("processor 报错");
+
+        }
+
+        @Override
+        public void onComplete() {
+            System.out.println("processor 完成");
+            subscription.request(1);
+
+        }
+    }
+
     public static void main(String[] args) throws InterruptedException {
         SubmissionPublisher<String> publisher = new SubmissionPublisher<>();
 
-
+        Flow.Processor<String,String> processor = new  MyProcessor();
         Flow.Subscriber<String> subscriber = new Flow.Subscriber<>() {
             private Flow.Subscription subscription;
 
@@ -45,7 +77,11 @@ public class FlowDemo {
             }
         };
 
-        publisher.subscribe(subscriber);
+//        publisher.subscribe(subscriber);
+        publisher.subscribe(processor);
+        processor.subscribe(subscriber);
+
+
         for (int i = 0; i < 10; i++) {
             publisher.submit("p-" + i);
         }
