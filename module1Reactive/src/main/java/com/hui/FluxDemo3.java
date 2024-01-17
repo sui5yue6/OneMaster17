@@ -1,17 +1,20 @@
 package com.hui;
 
+import org.reactivestreams.Subscription;
+import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 /**
  * @author Eirk
  * @Description
- * @Date 2024/1/16 22:02
+ * @Date 2024/1/17 0:45
  */
 public class FluxDemo3 {
     public static void main(String[] args) {
-        Flux.range(1,7)
-                .log()
-                .filter(vo->vo>3)
-                .map(i->"haha-"+i).subscribe(vo-> System.out.println(vo      ));
+
     }
+
+
 }
